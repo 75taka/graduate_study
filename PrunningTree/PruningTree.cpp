@@ -1,8 +1,8 @@
 ﻿// PruningTree.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
 //
 
-#include <iostream>
 #include "Swarm.h"
+#include "TrainingData.h"
 
 /*
 main関数内で行うこと
@@ -11,8 +11,43 @@ main関数内で行うこと
 ・計算の回数に応じて，枝刈りの回数の指定をする（枝刈り時のなにかしらの関数の引数に使う）
 ・出力
 */
+
 int main()
 {
+	const char* fname = "data003";
+
+	//変数初期化
+	TrainingData* td = NULL;
+	Tree* tree = NULL; 
+	//TreeNode::calcpoint = new double [8]; // これでdouble型のcalcpointが8つ用意された？
+
+	td = new TrainingData(fname); //データ読む
+	DataSubSet::trdata = td; //DataSubsetクラスのstatic変数trdataにtdを代入
+	TreeNode::trdata = td; //TreeNodeクラスのstatic変数trdataにtdを代入
+	tree = new Tree(); 
+
+
+	//td->showTrainingData();
+
+
+	/*
+	やりたいこと
+	・ファイルの数を数える
+	・TrainingData* trdata[ファイル数];
+	・Tree* tree[ファイル数分];
+	・int calcnum[ファイル数分]; //計算回数
+
+	for(ファイル数分)
+	{
+		trdata[i] = new ファイル読み込み;
+		tree[i] = new tree(trdata[i]);
+		calcnum[i] = tree[i]から計算回数を返す;
+	}
+
+	・calcnum[i]を整列
+	・比較回数を割り当て
+	・TestDataオブジェクトの作成・進化
+		*/
 	return 0;
 }
 

@@ -3,7 +3,6 @@
 //該当訓練データクラス
 /*
 とあるノードにたどり着く訓練データを示す
-（このノードに到達するデータはこれですよと指定しているだけ？）
 */
 
 #include "TestData.h"
@@ -11,11 +10,12 @@
 class DataSubSet
 {
 public:
-	static TrainingData* data;
+	static TrainingData* trdata;
 
 	DataSubSet(); //一番上の根ノードの際のコンストラクタ
 	DataSubSet(DataSubSet* parentSet, int attn, int attv); //根ノード以外のコンストラクタ?
 	~DataSubSet();
+	void showdataDist();
 
 	int** subdata;		// dataのtrainDataのレコードを指すポインタの配列
 	int subdataNum;			// データ数

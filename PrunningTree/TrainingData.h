@@ -1,4 +1,9 @@
 #pragma once
+#include <iostream>
+#include <stdio.h>
+#include <math.h>
+#include <string.h>
+#include <stdlib.h>
 
 //訓練データクラス
 
@@ -12,20 +17,23 @@
 class TrainingData
 {
 public:
-	TrainingData(char* dname); //コンストラクタ
+	TrainingData(const char* dname); //コンストラクタ
 	~TrainingData();
 	void showTrainingData();		//トレーニングデータの表示
 
 	char dataname[64];		// データの名前(おそらくファイル名)
+
+	//以下の3つがリストとなりそう
+	//attname[0]→「年齢」とか「attvaluename[0][0]→「20代」とかはでるっぽい
 	char** attname;			// 属性名
 	char*** attvaluename;	// 属性値名
 	char** classname;		// クラス名
+
 	int AttNum;				// 属性数
 	int* attvalueNum;		// 属性値数
 	int ClassNum;			// クラス数（ワイン買うに対して「はい」or「いいえ」）
 	int trainDataNum;		// 訓練データ数
 	int** trainData;		// 訓練データ
-
 };
 
 /*
