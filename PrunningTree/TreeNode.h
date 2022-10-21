@@ -34,8 +34,8 @@ public:
 	int processNum;
 	int correctNum;
 	double calcpoint; //計算スコア
-	int number_count[32][2];	//数字カウントするやつ
-	int term_count;				//上のやつカウント用
+	int number_count[32][2];	//同類項による計算スコア測定用 1次元目：同類項の種類，2次元目：その数
+	int term_count;				//同類項の数(↑の1次元目の要素数)
 
 private:
 	int selectAtt(DataSubSet* subset);			//情報利得比に基づいて属性を選択

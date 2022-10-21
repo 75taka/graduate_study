@@ -1,3 +1,5 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(513,5): warning MSB8028: 中間ディレクトリ (Debug\) に別のプロジェクト (PrunningTree.vcxproj) と共有されているファイルが含まれています。これにより、クリーンしてリビルド動作が適切に行われない可能性があります。
-  PruningTree.cpp
+  TreeNode.cpp
+C:\Users\takaw\OneDrive\デスクトップ\卒業研究用ファイル\PrunningTree\PrunningTree\TreeNode.cpp(82,6): warning C4101: 'a': ローカル変数は 1 度も使われていません。
+C:\Users\takaw\OneDrive\デスクトップ\卒業研究用ファイル\PrunningTree\PrunningTree\TreeNode.cpp(82,9): warning C4101: 'b': ローカル変数は 1 度も使われていません。
   PrunningTree.vcxproj -> C:\Users\takaw\OneDrive\デスクトップ\卒業研究用ファイル\PrunningTree\PrunningTree\Debug\PruningTree.exe

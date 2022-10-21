@@ -13,7 +13,7 @@ public:
 	static TrainingData* trdata;
 
 	DataSubSet(); //一番上の根ノードの際のコンストラクタ
-	DataSubSet(DataSubSet* parentSet, int attn, int attv); //根ノード以外のコンストラクタ?
+	DataSubSet(DataSubSet* parentSet, int attn, int attv); //根ノード以外のコンストラクタ
 	~DataSubSet();
 	void showdataDist();
 

@@ -14,6 +14,70 @@ main関数内で行うこと
 
 int main()
 {
+	int datanum, len, i, kind;
+	char** dataFname;
+	double* calcScore;
+	struct _finddata_t c_file;
+	long hFile;
+
+	TrainingData** td = NULL;
+	Tree** tree = NULL;
+
+	//エラー処理？
+	if ((hFile = _findfirst("data/*.csv", &c_file)) == -1L) {
+		printf("ディレクトリdataにはデータが存在しません．\n");
+		_findclose(hFile);
+		exit(1);
+	}
+
+	else {
+		for (datanum = 1; _findnext(hFile, &c_file) == 0; datanum++); //数を数える
+		_findclose(hFile);
+
+		//ファイル数分の領域確保
+		calcScore = new double [datanum];
+		td = new TrainingData* [datanum];
+		tree = new Tree* [datanum];
+		dataFname = new char* [datanum];
+
+		hFile = _findfirst("data/*.csv", &c_file);
+		//領域確保
+		for (i = 0; i < datanum - 1 ; i++) {
+			len = strlen(c_file.name);
+			dataFname[i] = new char[len - 3]; //ファイル名格納(-4は.cppの分？)
+			strncpy(dataFname[i], c_file.name, len - 4);
+			dataFname[i][len - 4] = '\0';
+			printf("%s\n", dataFname[i]);
+			//決定木形成
+			td[i] = new TrainingData(dataFname[i]); //データ読む
+			DataSubSet::trdata = td[i]; //DataSubsetクラスのstatic変数trdataにtdを代入
+			TreeNode::trdata = td[i]; //TreeNodeクラスのstatic変数trdataにtdを代入
+			tree[i] = new Tree();
+			printf("\n");
+			calcScore[i] = tree[i]->ScoreReturn();
+			_findnext(hFile, &c_file);
+		}
+		len = strlen(c_file.name);
+		dataFname[i] = new char[len - 3]; //ファイル名格納(-4は.cppの分？)
+		strncpy(dataFname[i], c_file.name, len - 4);
+		dataFname[i][len - 4] = '\0';
+		printf("%s\n", dataFname[i]);
+		//決定木形成
+		td[i] = new TrainingData(dataFname[i]); //データ読む
+		DataSubSet::trdata = td[i]; //DataSubsetクラスのstatic変数trdataにtdを代入
+		TreeNode::trdata = td[i]; //TreeNodeクラスのstatic変数trdataにtdを代入
+		tree[i] = new Tree();
+		printf("\n");
+		calcScore[i] = tree[i]->ScoreReturn();
+		_findclose(hFile);
+
+
+		for (i = 0; i < datanum; i++)
+			printf("データ番号%dの計算スコア:%lf\n", i, calcScore[i]);
+	}
+
+
+	/*
 	const char* fname = "data003";
 
 	//変数初期化
@@ -26,7 +90,7 @@ int main()
 	TreeNode::trdata = td; //TreeNodeクラスのstatic変数trdataにtdを代入
 	tree = new Tree(); 
 
-
+	*/
 	//td->showTrainingData();
 
 

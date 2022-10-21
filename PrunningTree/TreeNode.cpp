@@ -10,9 +10,6 @@ int TreeNode::stdClassNo = -1;
 TreeNode::TreeNode(DataSubSet* subset, TreeNode* aParent)
 {
 	DataSubSet* subset2; //下にたどり着くデータ
-
-	//if (trdata)
-		//printf("trdataはあるよ");
 	
 	///////// 終端・非終端共通の値を設定 ////////////
 	parent = aParent; //親ノード設定
@@ -29,13 +26,13 @@ TreeNode::TreeNode(DataSubSet* subset, TreeNode* aParent)
 	/////////// 終端・非終端を決定 attribute:属性 /////////////
 		//ノードにたどり着くデータのクラスが全て同じ　||　属性集合の要素が0
 	if ((subset->subdataNum == subset->dataDist[trdata->AttNum][0][subset->maxNumClass]) || (subset->attNum == 0)) {
-		attribute = -1; //属性未定
+		attribute = -1; //葉っぱの意味
 		classNo = subset->maxNumClass; //終端用にクラスの設定
 	}
 	//そもそもデータがもうない時
 	else if (subset->subdataNum == 0) {
-		attribute = -1; //属性未定
-		classNo = stdClassNo; //
+		attribute = -1; //葉っぱの意味
+		classNo = stdClassNo;
 	}
 	//↑以外
 	else {
@@ -46,7 +43,7 @@ TreeNode::TreeNode(DataSubSet* subset, TreeNode* aParent)
 	}
 
 	///////////// 終端・非終端に応じた値を設定 ///////////////
-	//終端ノードの場合　子ノードの数を0にする
+	//終端ノードの場合　子ノードの数を0にする(クラス決定→childNum = 0)
 	if (attribute == -1) {
 		childNum = 0;
 		child = NULL;
@@ -107,30 +104,40 @@ int TreeNode::selectAtt(DataSubSet* subset)
 		}
 	}
 
+	printf("e1:%lf\n", e1);
+
+	score_measure();
+	//printf("e1:%lf\n", calcpoint);
+
 	// e2を求めるフェイズ
 	for (i = 0; i < trdata->AttNum; i++) {
 		if (subset->attValue[i] == -1) {
 			e2 = 0.0;
 			for (j = 0; j < trdata->attvalueNum[i]; j++) {
 				for (k = 0; k < trdata->ClassNum; k++) {
-					if (subset->dataDist[i][j][k] != 0) {
-						e2 -= ((double)subset->dataDist[i][j][2] / (double)subset->subdataNum)
-							* ((double)subset->dataDist[i][j][k] / (double)subset->dataDist[i][j][2])
-							* log2((double)subset->dataDist[i][j][k] / (double)subset->dataDist[i][j][2]);
+					if (!(subset->dataDist[i][j][k] == 0 || subset->dataDist[i][j][k] == subset->dataDist[i][j][trdata->ClassNum])) {
+						e2 -= ((double)subset->dataDist[i][j][trdata->ClassNum] / (double)subset->subdataNum)
+							* ((double)subset->dataDist[i][j][k] / (double)subset->dataDist[i][j][trdata->ClassNum])
+							* log2((double)subset->dataDist[i][j][k] / (double)subset->dataDist[i][j][trdata->ClassNum]);
 						//同類項を纏める
 						judge_term(subset->dataDist[i][j][k]);
-						judge_term(subset->dataDist[i][j][2]);
+						judge_term(subset->dataDist[i][j][trdata->ClassNum]);
 						//約分判定(e2の時は必ず約分発生)
 						calcpoint += REDUC_SCORE_EASY;
 					}
 				}
 			}
 
+			score_measure();
+			printf("e2:%lf\n", e2);
+
 			// 情報利得
 			gain = e1 - e2;
+			printf("gain:%lf\n", gain);
 			calcpoint += CALC_SCORE_EASY;
 
 			// sinfo:分割情報量，gainR:情報利得比
+			// 残りの属性がもうなければ繰り返さないを入れたい　if (gain > 0 &&  まだ分けられる属性が残っている時)みたいな
 			if (gain > 0) {
 				sinfo = 0.0;
 				for (j = 0; j < trdata->attvalueNum[i]; j++) {
@@ -146,9 +153,15 @@ int TreeNode::selectAtt(DataSubSet* subset)
 					}
 				}
 
+				printf("sinfo:%lf\n", sinfo);
+
+				score_measure();
+				//printf("sinfo:%lf\n", calcpoint);
+
 				// 情報利得比
 				gainR = gain / sinfo;
 				calcpoint += CALC_SCORE_EASY;
+				printf("gainR:%lf\n", gainR);
 
 				// 戻り値とする属性(gainRが大きい属性iを戻り値とする)
 				if (gainR > maxGainR) {
@@ -157,11 +170,13 @@ int TreeNode::selectAtt(DataSubSet* subset)
 				}
 			}
 		}
+
+		//printf("属性別スコア:%lf\n", calcpoint);
 	}
 
-	score_measure();
+	//score_measure();
 	//printf("ノード別スコア:%lf\n", calcpoint);
-
+	printf("-------------------------\n");
 	return att;
 }
 
@@ -268,19 +283,20 @@ bool TreeNode::judge_pow2(unsigned int x)
 // 同類項を纏める関数
 void TreeNode::judge_term(int term_num) {
 	int i;
+	if (term_num != 1) {
+		for (i = 0; i < term_count; i++) {
+			if (number_count[i][0] == term_num)
+				break;
+		}
 
-	for (i = 0; i < term_count; i++) {
-		if (number_count[i][0] == term_num)
-			break;
-	}
-
-	if (i == term_count) {
-		number_count[i][0] = term_num;
-		number_count[i][1] = 1;
-		term_count++;
-	}
-	else {
-		number_count[i][1]++;
+		if (i == term_count) {
+			number_count[i][0] = term_num;
+			number_count[i][1] = 1;
+			term_count++;
+		}
+		else {
+			number_count[i][1]++;
+		}
 	}
 }
 
@@ -288,6 +304,7 @@ void TreeNode::judge_term(int term_num) {
 void TreeNode::score_measure()
 {
 	int i,j;
+	int plusnum = 0;
 
 	//同類項の計算スコア
 	for (i = 0; i < term_count; i++) {
@@ -298,16 +315,25 @@ void TreeNode::score_measure()
 
 	//対数計算スコア
 	for (i = 0; i < term_count; i++) {
-		if (judge_pow2(number_count[i][0]) == true) {
+		if (judge_pow2(number_count[i][0]) == true && number_count[i][1] != 0) {
 			calcpoint += LOG_SCORE_EASY;
 		}
-		else {
+		else if(judge_pow2(number_count[i][0]) == false && number_count[i][1] != 0){
 			calcpoint += LOG_SCORE;
 		}
 	}
 
 	//最後の足し算
-	for (i = 0; i < term_count - 1; i++) {
+	for (i = 0; i < term_count; i++) {
+		if (number_count[i][1] != 0)
+			plusnum++;
+	}
+	for (i = 0; i < plusnum - 1; i++) {
 		calcpoint += CALC_SCORE_EASY;
+	}
+
+	//リセット
+	for (i = 0; i < term_count; i++) {
+		number_count[i][1] = 0;
 	}
 }

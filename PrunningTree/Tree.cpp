@@ -41,3 +41,8 @@ void Tree::calcScore()
 {
 	TreeScore = root->countScore();
 }
+
+double Tree::ScoreReturn()
+{
+	return TreeScore;
+}

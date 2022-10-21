@@ -14,6 +14,7 @@ public:
 	void countnode(); //ノード数カウント
 	void setDepth(); //深さカウント
 	void calcScore(); //計算スコアカウント
+	double ScoreReturn();
 
 	//未
 	double get_evaluation(); //評価値計算
